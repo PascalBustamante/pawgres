@@ -2,11 +2,10 @@ from sqlalchemy import create_engine
 import pandas as pd
 from typing import Dict, List, Any
 import os
-from dotenv import load_dotenv
 
 class DatabaseConnector:
-    def __init__(self):
-        load_dotenv()
+    def __init__(self, filename="../config/config.ini", section="postgresql"):
+        
         self.engine = self._create_engine()
         self.schemas = {
             'staging': 'staging_layer',
@@ -15,6 +14,8 @@ class DatabaseConnector:
         }
 
     def _create_engine(self):
+        """Create a database engine"""
+        url = 
         return create_engine(
             f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
             f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"

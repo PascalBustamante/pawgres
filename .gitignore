@@ -135,10 +135,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-<<<<<<< HEAD
-=======
-.ini
->>>>>>> 061f6d2 (init)
+*.ini
 
 # Spyder project settings
 .spyderproject

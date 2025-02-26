@@ -1,26 +1,23 @@
-from dotenv import load_dotenv
 from typing import Dict, List, Optional
+from config.config import config
 import requests
 import time
 import os
 
 
 class PetfinderAPI:
-    def __init__(self):
-        load_dotenv()
-        self.api_key = os.getenv("PETFINDER_API_KEY")
-        self.api_secret = os.getenv("PETFINDER_API_SECRET")
-        self.base_url = os.getenv("PETFINDER_URL")
+    def __init__(self, filename="config/config.ini", section="petfinder"):
+        self.credentials = config(filename=filename, section=section)
         self.access_token = None
         self.token_expiry = 0
 
     def get_access_token(self):
         data = {
             "grant_type": "client_credentials",
-            "client_id": self.api_key,
-            "client_secret": self.api_secret,
+            "client_id": self.credentials["api_key"],
+            "client_secret": self.credentials["api_secret"],
         }
-        response = requests.post(f"{self.base_url}/oauth2/token", data=data)
+        response = requests.post(f"{self.credentials["base_url"]}/oauth2/token", data=data)
         response.raise_for_status()
 
         self.access_token = response.json()["access_token"]
@@ -42,7 +39,7 @@ class PetfinderAPI:
 
         headers = {"Authorization": f"Bearer {self.access_token}"}
 
-        url = f"{self.base_url}/{endpoint}"
+        url = f"{self.credentials["base_url"]}/{endpoint}"
 
         response = requests.request(
             method=method, url=url, headers=headers, params=params
