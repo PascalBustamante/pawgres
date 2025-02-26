@@ -135,6 +135,10 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+<<<<<<< HEAD
+=======
+.ini
+>>>>>>> 061f6d2 (init)
 
 # Spyder project settings
 .spyderproject
@@ -168,4 +172,8 @@ cython_debug/
 #.idea/
 
 # PyPI configuration file
+<<<<<<< HEAD
 .pypirc
+=======
+.pypirc
+>>>>>>> 061f6d2 (init)
