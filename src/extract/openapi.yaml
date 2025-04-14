@@ -1,0 +1,718 @@
+openapi: 3.0.2
+info:
+  title: Petfinder API
+  description: |
+    The Petfinder API allows you to access the Petfinder database of hundreds
+    of thousands of pets ready for adoption and over ten thousand animal
+    welfare organizations.
+  termsOfService: 'https://www.petfinder.com/api-terms-of-service/'
+  contact:
+    name: Petfinder API Help
+    url: 'https://www.petfinder.com/developers/support/'
+    email: help@petfinder.com
+  version: 1.0.0
+servers:
+  - url: 'https://api.petfinder.com/v2'
+externalDocs:
+  description: Petfinder API Documentation
+  url: 'https://www.petfinder.com/developers/v2/docs/'
+security:
+  - oauth2: []
+tags:
+  - name: Animal
+    description: Endpoints for animals
+  - name: Organization
+    description: Endpoints for organizations.
+paths:
+  /types:
+    get:
+      operationId: animalTypes.list
+      summary: Get Animal Types
+      tags:
+        - Animal
+      responses:
+        '200':
+          description: Type collection
+          content:
+            application/json:
+              schema:
+                properties:
+                  types:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AnimalType'
+  '/types/{type}':
+    parameters:
+      - name: type
+        in: path
+        required: true
+        description: Animal type
+        schema:
+          type: string
+    get:
+      operationId: animalTypes.show
+      summary: Get Animal Type
+      tags:
+        - Animal
+      responses:
+        '200':
+          description: Type information
+          content:
+            application/json:
+              schema:
+                properties:
+                  type:
+                    $ref: '#/components/schemas/AnimalType'
+        default:
+          $ref: '#/components/responses/Error'
+  '/types/{type}/breeds':
+    parameters:
+      - name: type
+        in: path
+        required: true
+        description: Animal type
+        schema:
+          type: string
+    get:
+      operationId: animalTypeBreeds.list
+      summary: Get Animal Breeds
+      tags:
+        - Animal
+      responses:
+        '200':
+          description: Breeds collection
+          content:
+            application/json:
+              schema:
+                properties:
+                  breeds:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AnimalBreed'
+        default:
+          $ref: '#/components/responses/Error'
+  /animals:
+    get:
+      operationId: animals.list
+      summary: Get Animals
+      tags:
+        - Animal
+      parameters:
+        - name: type
+          in: query
+          description: Filter results matching animal type
+          schema:
+            type: string
+            enum:
+              - dog
+              - cat
+              - small-furry
+              - bird
+              - scales-fins-other
+              - barnyard
+              - rabbit
+              - horse
+        - name: breed
+          in: query
+          description: Filter results matching animal breed
+          schema:
+            type: array
+            items:
+              type: string
+        - name: size
+          in: query
+          description: Filter results matching animal size
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - small
+                - medium
+                - large
+                - extra-large
+        - name: gender
+          in: query
+          description: Filter results matching animal gender
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - male
+                - female
+                - unknown
+        - name: age
+          in: query
+          description: Filter results matching animal age
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - baby
+                - young
+                - adult
+                - senior
+        - name: color
+          in: query
+          description: Filter results matching animal color
+          schema:
+            type: array
+            items:
+              type: string
+        - name: coat
+          in: query
+          description: Filter results matching animal coat
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - short
+                - medium
+                - long
+                - wire
+                - hairless
+                - curly
+        - name: organization
+          in: query
+          description: Filter results by organization
+          schema:
+            type: array
+            items:
+              type: string
+        - name: name
+          in: query
+          description: Filter results by name. Uses partial match.
+          schema:
+            type: string
+        - name: location
+          in: query
+          description: >-
+            Filter results matching animal location (postal code, city/state,
+            lat/long)
+          schema:
+            type: string
+        - name: distance
+          in: query
+          description: Filter results by distance from given location
+          schema:
+            type: integer
+        - $ref: '#/components/parameters/AnimalStatus'
+        - name: sort
+          in: query
+          description: Field to sort by
+          schema:
+            type: string
+            enum:
+              - recent
+              - '-recent'
+              - distance
+              - '-distance'
+              - random
+            default: recent
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationPage'
+      responses:
+        '200':
+          description: Animal collection
+          content:
+            application/json:
+              schema:
+                properties:
+                  animals:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Animal'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        default:
+          $ref: '#/components/responses/Error'
+  '/animals/{id}':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Animal ID
+        schema:
+          type: integer
+    get:
+      operationId: animals.show
+      summary: Get Animal
+      tags:
+        - Animal
+      responses:
+        '200':
+          description: Animal
+          content:
+            application/json:
+              schema:
+                properties:
+                  animal:
+                    $ref: '#/components/schemas/Animal'
+  /organizations:
+    get:
+      operationId: organizations.list
+      summary: Get Organizations
+      tags:
+        - Organization
+      parameters:
+        - name: name
+          in: query
+          description: Filter results matching organization name
+          schema:
+            type: string
+        - name: location
+          in: query
+          description: >-
+            Filter results by location (_postal code_, _city/state_, or
+            _lat/long_)
+          schema:
+            type: string
+        - name: distance
+          in: query
+          description: Filter results by distance from given location
+          schema:
+            type: integer
+        - name: country
+          in: query
+          description: Filter results by country
+          schema:
+            type: string
+        - name: state
+          in: query
+          description: Filter results by state
+          schema:
+            type: string
+        - name: query
+          in: query
+          description: >-
+            Search on _name_, _city_, _state_; Fuzzy search that includes
+            synonyms, punctuation, etc.
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Sort results by field
+          schema:
+            type: string
+            enum:
+              - distance
+              - '-distance'
+              - name
+              - '-name'
+              - country
+              - '-country'
+              - state
+              - '-state'
+        - $ref: '#/components/parameters/PaginationLimit'
+        - $ref: '#/components/parameters/PaginationPage'
+      responses:
+        '200':
+          description: Organization collection
+          content:
+            application/json:
+              schema:
+                properties:
+                  organizations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Organization'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        default:
+          $ref: '#/components/responses/Error'
+  '/organizations/{id}':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Organization ID
+        schema:
+          type: string
+    get:
+      operationId: organizations.show
+      summary: Get Organization
+      tags:
+        - Organization
+      responses:
+        '200':
+          description: Organization
+          content:
+            application/json:
+              schema:
+                properties:
+                  organization:
+                    $ref: '#/components/schemas/Organization'
+        default:
+          $ref: '#/components/responses/Error'
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth2/token
+          scopes: {}
+  parameters:
+    PaginationLimit:
+      name: limit
+      in: query
+      description: Number of results to return
+      schema:
+        type: integer
+        default: 20
+        maximum: 100
+    PaginationPage:
+      name: page
+      in: query
+      description: Page of results to return
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+    AnimalStatus:
+      name: status
+      in: query
+      description: Filter by adoption status
+      schema:
+        type: string
+        enum:
+          - adoptable
+          - adopted
+          - found
+  responses:
+    Error:
+      description: Error
+      content:
+        application/problem+json:
+          schema:
+            properties:
+              type:
+                type: string
+              title:
+                type: string
+              detail:
+                type: string
+              status:
+                type: integer
+  schemas:
+    Pagination:
+      properties:
+        count_per_page:
+          type: integer
+          example: 20
+        total_count:
+          type: integer
+          example: 320
+        current_page:
+          type: integer
+          example: 1
+        total_pages:
+          type: integer
+          example: 16
+        _links:
+          readOnly: true
+          nullable: true
+          properties:
+            previous:
+              $ref: '#/components/schemas/LinkNullable'
+            next:
+              $ref: '#/components/schemas/LinkNullable'
+    Photo:
+      properties:
+        small:
+          type: string
+          format: uri
+        medium:
+          type: string
+          format: uri
+        large:
+          type: string
+          format: uri
+        full:
+          type: string
+          format: uri
+    Link:
+      properties:
+        href:
+          description: Relative URL to linked resource
+          type: string
+          format: uri-reference
+    LinkNullable:
+      properties:
+        href:
+          description: Relative URL to linked resource
+          type: string
+          format: uri-reference
+          nullable: true
+    AnimalType:
+      properties:
+        name:
+          type: string
+        coats:
+          type: array
+          items:
+            type: string
+        colors:
+          type: array
+          items:
+            type: string
+        genders:
+          type: array
+          items:
+            type: string
+        _links:
+          readOnly: true
+          properties:
+            self:
+              $ref: '#/components/schemas/Link'
+            breeds:
+              $ref: '#/components/schemas/Link'
+    AnimalBreed:
+      properties:
+        name:
+          type: string
+        _links:
+          readOnly: true
+          properties:
+            type:
+              $ref: '#/components/schemas/Link'
+    Animal:
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organization_id:
+          type: string
+        url:
+          type: string
+          format: uri
+        type:
+          type: string
+        species:
+          type: string
+          nullable: true
+        breeds:
+          properties:
+            primary:
+              type: string
+              nullable: true
+            secondary:
+              type: string
+              nullable: true
+            mixed:
+              type: boolean
+              nullable: true
+            unknown:
+              type: boolean
+              nullable: true
+        colors:
+          properties:
+            primary:
+              type: string
+              nullable: true
+            secondary:
+              type: string
+              nullable: true
+            tertiary:
+              type: string
+              nullable: true
+        age:
+          type: string
+          nullable: true
+        gender:
+          type: string
+          nullable: true
+        size:
+          type: string
+          nullable: true
+        coat:
+          type: string
+          nullable: true
+        attributes:
+          properties:
+            spayed_neutered:
+              type: boolean
+            house_trained:
+              type: boolean
+            declawed:
+              type: boolean
+              nullable: true
+            special_needs:
+              type: boolean
+            shots_current:
+              type: boolean
+        environment:
+          properties:
+            children:
+              type: boolean
+              nullable: true
+            dogs:
+              type: boolean
+              nullable: true
+            cats:
+              type: boolean
+              nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photo'
+        status:
+          type: string
+          description: Adoption status
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+        contact:
+          properties:
+            email:
+              type: string
+              format: email
+              nullable: true
+            phone:
+              type: string
+              nullable: true
+            address:
+              properties:
+                address1:
+                  type: string
+                  nullable: true
+                address2:
+                  type: string
+                  nullable: true
+                city:
+                  type: string
+                  nullable: true
+                state:
+                  type: string
+                postcode:
+                  type: string
+                country:
+                  type: string
+        _links:
+          readOnly: true
+          properties:
+            self:
+              $ref: '#/components/schemas/Link'
+            type:
+              $ref: '#/components/schemas/Link'
+            organization:
+              $ref: '#/components/schemas/Link'
+    Organization:
+      properties:
+        id:
+          type: string
+          example: NJ333
+          readOnly: true
+        name:
+          type: string
+          example: A+ Pet Shelter
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          nullable: true
+        address:
+          properties:
+            address1:
+              type: string
+              nullable: true
+            address2:
+              type: string
+              nullable: true
+            city:
+              type: string
+              nullable: true
+            state:
+              type: string
+            postcode:
+              type: string
+            country:
+              type: string
+        hours:
+          properties:
+            sunday:
+              type: string
+              nullable: true
+            monday:
+              type: string
+              nullable: true
+            tuesday:
+              type: string
+              nullable: true
+            wednesday:
+              type: string
+              nullable: true
+            thursday:
+              type: string
+              nullable: true
+            friday:
+              type: string
+              nullable: true
+            saturday:
+              type: string
+              nullable: true
+        url:
+          type: string
+          format: uri
+        website:
+          type: string
+          format: uri
+          nullable: true
+        mission_statement:
+          type: string
+          nullable: true
+        adoption:
+          properties:
+            policy:
+              type: string
+              nullable: true
+            url:
+              type: string
+              nullable: true
+        social_media:
+          properties:
+            facebook:
+              type: string
+              format: uri
+              nullable: true
+            instagram:
+              type: string
+              format: uri
+              nullable: true
+            twitter:
+              type: string
+              format: uri
+              nullable: true
+            pinterest:
+              type: string
+              format: uri
+              nullable: true
+            youtube:
+              type: string
+              format: uri
+              nullable: true
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photo'
+        _links:
+          readOnly: true
+          properties:
+            self:
+              $ref: '#/components/schemas/Link'
+            animals:
+              $ref: '#/components/schemas/Link'

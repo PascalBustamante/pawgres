@@ -1,25 +1,30 @@
 from sqlalchemy import create_engine
+from config.config import config
 import pandas as pd
 from typing import Dict, List, Any
 import os
 
 class DatabaseConnector:
-    def __init__(self, filename="../config/config.ini", section="postgresql"):
-        
+    def __init__(self, filename="config/config.ini", section="postgresql"):
+        self.credentials = config(filename=filename, section=section)
         self.engine = self._create_engine()
         self.schemas = {
-            'staging': 'staging_layer',
-            'integration': 'integration_layer',
-            'access': 'access_layer'
+            'staging': 'staging',
+            'intermediate': 'intermediate',
+            'marts': 'marts',
+            'logging': 'logging'
         }
 
     def _create_engine(self):
         """Create a database engine"""
-        url = 
-        return create_engine(
-            f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
-            f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
-        )
+        url = "postgresql+psycopg2://{0}:{1}@{2}:{3}/{4}".format(
+            self.credentials["user"], 
+            self.credentials["password"], 
+            self.credentials["host"], 
+            self.credentials["port"], 
+            self.credentials["dbname"]
+            )
+        return create_engine(url=url)
     
     def query_layer(self, layer: str, query: str) -> pd.DataFrame:
         """Query specific layer and returns a pandas df"""

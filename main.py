@@ -25,7 +25,7 @@ def process_dog_data(dogs_data: Dict) -> List[Dict]:
             "photos": [photo.get("full") for photo in dog.get("photos", [])],
         }
         processed_dogs.append(processed_dog)
-
+    print(dogs_data["animals"][1])
     return processed_dogs
 
 
@@ -36,7 +36,7 @@ def main():
 
         # Get some dogs
         dogs_data = api.get_dogs(location="New York, NY", distance=50, limit=100)
-        print(dogs_data)
+        #print(dogs_data)
 
         # Process the data
         processed_dogs = process_dog_data(dogs_data)
